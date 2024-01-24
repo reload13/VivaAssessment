@@ -6,30 +6,42 @@ namespace Library;
 
 use ReflectionMethod;
 //use App\Exceptions\PageNotFoundException;
+use Exception;
 use UnexpectedValueException;
 
 class Dispatcher
 {
+
+    private $auth;
     public function __construct(private Router $router,
                                 private Container $container,
+                                array $auth
                                 )
     {
-
+        $this->auth = $auth;
     }
 
     public function handle(Request $request): Response
     {
 
-        $path = $this->getPath($request->uri);
+        // Check authentication routing
+        $requiresAuthentication = $this->routeRequiresAuthentication($request,$this->auth);
 
+        if (!$requiresAuthentication) {
+
+            header('Location: /users/login');
+            exit();
+
+        }
+
+        $path = $this->getPath($request->uri);
         $params = $this->router->match($path, $request->method);
 
         if ($params === false) {
 
-//            throw new PageNotFoundException("No route matched for '$path' with method '{$request->method}'");
+            throw new Exception("No route matched for '$path' with method '{$request->method}'");
 
         }
-
 
         $action = $this->getActionName($params);
         $controller = $this->getControllerName($params);
@@ -45,8 +57,6 @@ class Dispatcher
         $controller_handler = new ControllerRequestHandler($controller_object,
             $action,
             $args);
-
-
 
         return $controller_handler->handle($request);
     }
@@ -75,7 +85,7 @@ class Dispatcher
 
         $controller = str_replace("-", "", ucwords(strtolower($controller), "-"));
 
-        $namespace = "Controllers";
+        $namespace = "Main\\Controllers";
 
         if (array_key_exists("namespace", $params)) {
 
@@ -106,5 +116,39 @@ class Dispatcher
         }
 
         return $path;
+    }
+
+    private function routeRequiresAuthentication(Request $request, array $auth): bool
+    {
+        $path = $this->getPath($request->uri);
+        $params = $this->router->match($path, $request->method);
+
+        if($request->method == "POST"){
+            return true; // Post routes not included
+        }
+
+        if ($params === false) {
+            return false; // Route not found, handle accordingly
+        }
+
+        if (in_array($path, $auth['public'])) {
+            return true; // No authentication required for public routes
+        }
+
+
+        // Check if the route requires authentication based on your logic
+        foreach ($auth['authenticated'] as $routePattern => $requiredRoles) {
+            if (preg_match("#^$routePattern$#", $path)) {
+                // Check if the user has any of the required roles for the matched route
+                foreach ($requiredRoles as $role) {
+                    if (!empty($_SESSION['roles']) && in_array($role, explode(",",$_SESSION['roles']))) {
+                        return true; // User has one of the required roles, authentication is required
+                    }
+                }
+            }
+        }
+
+
+        return false;
     }
 }

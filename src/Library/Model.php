@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Library;
 
+use Library\Database;
 use PDO;
-use \Library\Database;
 
 abstract class Model
 {

@@ -19,9 +19,10 @@ class Database
 
     public function getConnection(): PDO
     {
+
         if ($this->pdo === null) {
 
-            $dsn = "mysql:host={$this->host};dbname={$this->name};charset=utf8;port=3306";
+            $dsn = "mysql:host={$this->host};dbname={$this->name};charset=utf8;port=8889";
 
             $this->pdo = new PDO($dsn, $this->user, $this->password, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION

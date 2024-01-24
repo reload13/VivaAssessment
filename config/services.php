@@ -2,16 +2,16 @@
 
 $container = new Library\Container;
 
-// Database example
+
 $container->set(Library\Database::class, function() {
 
     return new Library\Database($_ENV["DB_HOST"], $_ENV["DB_NAME"], $_ENV["DB_USER"], $_ENV["DB_PASSWORD"]);
 
 });
 
-//// Viewer example
+
 $container->set(Library\TemplateInterface::class, function() {
-//
+
     return new Library\PHPTemplate;
 
 });

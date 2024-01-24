@@ -27,7 +27,6 @@ class Container
         }
 
         $reflector = new ReflectionClass($class_name);
-//var_dump($class_name);
         $constructor = $reflector->getConstructor();
 
         $dependencies = [];

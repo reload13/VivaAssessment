@@ -8,8 +8,10 @@ class PHPTemplate implements TemplateInterface
 {
     public function render(string $template, array $data = []): string
     {
-        return json_encode($data) ;
         $views_dir = dirname(__DIR__, 2) . "/views/";
+//        die("asd");
+//        return json_encode($data) ;
+
 
         $code = file_get_contents($views_dir . $template);
 
@@ -23,6 +25,7 @@ class PHPTemplate implements TemplateInterface
 
         }
 
+//        die($views_dir . $matches["template"]);
         $code = $this->loadIncludes($views_dir, $code);
 
         $code = $this->replaceVariables($code);
