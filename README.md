@@ -3,7 +3,9 @@ An e-commerce app
 
 For the user to access the products page he has to be signed in. 
 By using the included database the user can access the url localhost/users/login where you can use the credentials for an admin user
+
 username: reload1917@gmail.com
+
 password: 12341234r
 
 Also you can make a new user by registering in localhost/users/register
